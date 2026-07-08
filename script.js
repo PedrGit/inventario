@@ -60,15 +60,21 @@ document.querySelector("#adicionar").addEventListener("click", () => {
   let encontrados = [];
 
   ids.forEach(id => {
-    const idNum = Number(id); // converte para número
+    const idNum = Number(id);
     const resultado = planilha.find(row => {
-      const valor = Number(row[colunaID]);
-      return valor === idNum;
+      const valor = row[colunaID];
+      if (valor === undefined || valor === null) return false;
+
+      // Converte tudo para string e número para comparação flexível
+      const valorStr = String(valor).trim();
+      const valorNum = Number(valor);
+
+      return valorStr === id || valorNum === idNum;
     });
 
     if (resultado) {
       resultado.categoria = categoria;
-      if (!inventario.some(item => Number(item[colunaID]) === idNum)) {
+      if (!inventario.some(item => String(item[colunaID]).trim() === String(resultado[colunaID]).trim())) {
         inventario.push(resultado);
         encontrados.push(resultado);
       }
