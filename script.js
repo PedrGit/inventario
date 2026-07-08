@@ -1,5 +1,6 @@
 let planilha = [];
 let inventario = [];
+let colunaID = null; // detecta automaticamente a coluna de ID
 
 const tabela = document.querySelector("#tabela tbody");
 const contador = document.querySelector("#contador");
@@ -25,7 +26,22 @@ function handleFile(e) {
       return novo;
     });
 
-    statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas)`;
+    // Detecta automaticamente a coluna que contém IDs
+    const colunas = Object.keys(planilha[0]);
+    colunaID = colunas.find(c =>
+      c.includes("id") ||
+      c.includes("código") ||
+      c.includes("codigo") ||
+      c.includes("item") ||
+      c.includes("sap")
+    );
+
+    if (!colunaID) {
+      alert("⚠️ Nenhuma coluna de ID encontrada na planilha. Verifique os nomes das colunas.");
+      return;
+    }
+
+    statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas) | Coluna de ID detectada: ${colunaID}`;
   };
   reader.readAsArrayBuffer(file);
 }
@@ -43,17 +59,10 @@ document.querySelector("#adicionar").addEventListener("click", () => {
   let encontrados = [];
 
   ids.forEach(id => {
-    // Busca por qualquer coluna que contenha o ID
-    const resultado = planilha.find(row =>
-      String(row.id) === id ||
-      String(row["código"]) === id ||
-      String(row["codigo"]) === id ||
-      String(row["id do item"]) === id
-    );
-
+    const resultado = planilha.find(row => String(row[colunaID]) === id);
     if (resultado) {
       resultado.categoria = categoria;
-      if (!inventario.some(item => item.id === resultado.id)) {
+      if (!inventario.some(item => item[colunaID] === resultado[colunaID])) {
         inventario.push(resultado);
         encontrados.push(resultado);
       }
@@ -84,7 +93,7 @@ function atualizarTabela() {
   tabela.innerHTML = "";
   inventario.forEach((item, index) => {
     const row = `<tr>
-      <td>${item.id || ""}</td>
+      <td>${item[colunaID] || ""}</td>
       <td>${item["código"] || item["codigo"] || ""}</td>
       <td>${item["descrição"] || ""}</td>
       <td>${item["referência uso"] || ""}</td>
