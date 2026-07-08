@@ -24,11 +24,12 @@ function handleFile(e) {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       planilha = XLSX.utils.sheet_to_json(sheet);
 
-      if (planilha.length === 0) {
+      if (!planilha || planilha.length === 0) {
         statusUpload.textContent = "⚠️ Planilha vazia ou formato inválido.";
         return;
       }
 
+      // Normaliza nomes das colunas
       planilha = planilha.map(row => {
         const novo = {};
         for (let chave in row) {
@@ -43,7 +44,7 @@ function handleFile(e) {
       );
 
       if (!colunaID) {
-        statusUpload.textContent = "⚠️ Nenhuma coluna de ID encontrada.";
+        statusUpload.textContent = "⚠️ Nenhuma coluna de ID encontrada na planilha.";
         return;
       }
 
@@ -71,7 +72,7 @@ document.querySelector("#adicionar").addEventListener("click", () => {
   const idsInput = document.querySelector("#ids").value;
   const categoria = document.querySelector("input[name='categoria']:checked").value;
 
-  // ✅ aceita vírgula, espaço e quebra de linha
+  // Aceita vírgula, espaço e quebra de linha
   const ids = idsInput
     .split(/[\s,]+/)
     .map(i => i.trim())
@@ -134,4 +135,10 @@ function atualizarTabela() {
     </tr>`;
     tabela.insertAdjacentHTML("beforeend", row);
   });
-  contador.textContent = `Total de itens: ${inventario.length} | IN HOME: ${invent
+  contador.textContent = `Total de itens: ${inventario.length} | IN HOME: ${inventario.filter(i => i.categoria === "IN HOME").length} | LABORATÓRIO: ${inventario.filter(i => i.categoria === "LABORATÓRIO").length}`;
+}
+
+function remover(index) {
+  inventario.splice(index, 1);
+  atualizarTabela();
+}
