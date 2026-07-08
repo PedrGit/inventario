@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventário Automático</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>📦 Inventário Automático</h1>
+  </header>
+
+  <section class="pesquisa">
+    <h2>🔍 Pesquisa</h2>
+    <label for="ids">Digite os IDs (separados por vírgula ou espaço):</label>
+    <textarea id="ids" placeholder="Ex: 120091, 120092, 120093"></textarea>
+
+    <div class="categoria">
+      <label><input type="radio" name="categoria" value="IN HOME" checked> IN HOME</label>
+      <label><input type="radio" name="categoria" value="LABORATÓRIO"> LABORATÓRIO</label>
+    </div>
+
+    <button id="adicionar">Adicionar IDs</button>
+  </section>
+
+  <section class="inventario">
+    <h2>📊 Inventário acumulado</h2>
+    <div id="contador"></div>
+    <table id="tabela">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Categoria</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button id="baixar">⬇️ Baixar Inventário (Excel)</button>
+    <button id="limpar">🗑️ Limpar Inventário</button>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
