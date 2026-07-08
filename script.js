@@ -3,6 +3,7 @@ let inventario = [];
 
 const tabela = document.querySelector("#tabela tbody");
 const contador = document.querySelector("#contador");
+const statusUpload = document.querySelector("#statusUpload");
 
 document.querySelector("#upload").addEventListener("change", handleFile);
 
@@ -14,12 +15,17 @@ function handleFile(e) {
     const workbook = XLSX.read(data, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     planilha = XLSX.utils.sheet_to_json(sheet);
-    alert("✅ Planilha carregada com sucesso!");
+    statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas)`;
   };
   reader.readAsArrayBuffer(file);
 }
 
 document.querySelector("#adicionar").addEventListener("click", () => {
+  if (planilha.length === 0) {
+    alert("⚠️ Carregue uma planilha antes de pesquisar.");
+    return;
+  }
+
   const idsInput = document.querySelector("#ids").value;
   const categoria = document.querySelector("input[name='categoria']:checked").value;
   const ids = idsInput.replace(/,/g, " ").split(" ").map(i => i.trim()).filter(i => i);
@@ -64,6 +70,12 @@ function atualizarTabela() {
       <td>${item.ID}</td>
       <td>${item.Código || ""}</td>
       <td>${item.Descrição || ""}</td>
+      <td>${item["Referência Uso"] || ""}</td>
+      <td>${item["OS Fabricante"] || ""}</td>
+      <td>${item["Status garantia"] || ""}</td>
+      <td>${item["Status peça garantia"] || ""}</td>
+      <td>${item["Recebimento UPC"] || ""}</td>
+      <td>${item["Modelo Principal"] || ""}</td>
       <td>${item.Categoria}</td>
       <td><button onclick="remover(${index})">Remover</button></td>
     </tr>`;
