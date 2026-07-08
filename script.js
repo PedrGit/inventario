@@ -1,6 +1,6 @@
 let planilha = [];
 let inventario = [];
-let colunaID = null; // detecta automaticamente a coluna de ID
+let colunaID = null;
 
 const tabela = document.querySelector("#tabela tbody");
 const contador = document.querySelector("#contador");
@@ -26,7 +26,7 @@ function handleFile(e) {
       return novo;
     });
 
-    // Detecta automaticamente a coluna que contém IDs
+    // Detecta automaticamente a coluna de ID
     const colunas = Object.keys(planilha[0]);
     colunaID = colunas.find(c =>
       c.includes("id") ||
@@ -42,6 +42,7 @@ function handleFile(e) {
     }
 
     statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas) | Coluna de ID detectada: ${colunaID}`;
+    console.log("Colunas detectadas:", colunas);
   };
   reader.readAsArrayBuffer(file);
 }
@@ -59,10 +60,15 @@ document.querySelector("#adicionar").addEventListener("click", () => {
   let encontrados = [];
 
   ids.forEach(id => {
-    const resultado = planilha.find(row => String(row[colunaID]) === id);
+    const idNum = Number(id); // converte para número
+    const resultado = planilha.find(row => {
+      const valor = Number(row[colunaID]);
+      return valor === idNum;
+    });
+
     if (resultado) {
       resultado.categoria = categoria;
-      if (!inventario.some(item => item[colunaID] === resultado[colunaID])) {
+      if (!inventario.some(item => Number(item[colunaID]) === idNum)) {
         inventario.push(resultado);
         encontrados.push(resultado);
       }
