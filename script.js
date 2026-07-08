@@ -15,6 +15,16 @@ function handleFile(e) {
     const workbook = XLSX.read(data, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     planilha = XLSX.utils.sheet_to_json(sheet);
+
+    // Normaliza nomes das colunas
+    planilha = planilha.map(row => {
+      const novo = {};
+      for (let chave in row) {
+        novo[chave.trim().toLowerCase()] = row[chave];
+      }
+      return novo;
+    });
+
     statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas)`;
   };
   reader.readAsArrayBuffer(file);
@@ -33,10 +43,17 @@ document.querySelector("#adicionar").addEventListener("click", () => {
   let encontrados = [];
 
   ids.forEach(id => {
-    const resultado = planilha.find(row => String(row.ID) === id);
+    // Busca por qualquer coluna que contenha o ID
+    const resultado = planilha.find(row =>
+      String(row.id) === id ||
+      String(row["código"]) === id ||
+      String(row["codigo"]) === id ||
+      String(row["id do item"]) === id
+    );
+
     if (resultado) {
-      resultado.Categoria = categoria;
-      if (!inventario.some(item => item.ID === resultado.ID)) {
+      resultado.categoria = categoria;
+      if (!inventario.some(item => item.id === resultado.id)) {
         inventario.push(resultado);
         encontrados.push(resultado);
       }
@@ -67,21 +84,21 @@ function atualizarTabela() {
   tabela.innerHTML = "";
   inventario.forEach((item, index) => {
     const row = `<tr>
-      <td>${item.ID}</td>
-      <td>${item.Código || ""}</td>
-      <td>${item.Descrição || ""}</td>
-      <td>${item["Referência Uso"] || ""}</td>
-      <td>${item["OS Fabricante"] || ""}</td>
-      <td>${item["Status garantia"] || ""}</td>
-      <td>${item["Status peça garantia"] || ""}</td>
-      <td>${item["Recebimento UPC"] || ""}</td>
-      <td>${item["Modelo Principal"] || ""}</td>
-      <td>${item.Categoria}</td>
+      <td>${item.id || ""}</td>
+      <td>${item["código"] || item["codigo"] || ""}</td>
+      <td>${item["descrição"] || ""}</td>
+      <td>${item["referência uso"] || ""}</td>
+      <td>${item["os fabricante"] || ""}</td>
+      <td>${item["status garantia"] || ""}</td>
+      <td>${item["status peça garantia"] || ""}</td>
+      <td>${item["recebimento upc"] || ""}</td>
+      <td>${item["modelo principal"] || ""}</td>
+      <td>${item.categoria}</td>
       <td><button onclick="remover(${index})">Remover</button></td>
     </tr>`;
     tabela.insertAdjacentHTML("beforeend", row);
   });
-  contador.textContent = `Total de itens: ${inventario.length} | IN HOME: ${inventario.filter(i => i.Categoria === "IN HOME").length} | LABORATÓRIO: ${inventario.filter(i => i.Categoria === "LABORATÓRIO").length}`;
+  contador.textContent = `Total de itens: ${inventario.length} | IN HOME: ${inventario.filter(i => i.categoria === "IN HOME").length} | LABORATÓRIO: ${inventario.filter(i => i.categoria === "LABORATÓRIO").length}`;
 }
 
 function remover(index) {
