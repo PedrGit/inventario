@@ -13,8 +13,9 @@
   </header>
 
   <section class="upload">
-    <h2>📂 Upload da Planilha</h2>
+    <h2>📂 Upload da Planilha Excel</h2>
     <input type="file" id="upload" accept=".xlsx,.xls">
+    <p id="statusUpload">Nenhuma planilha carregada.</p>
   </section>
 
   <section class="pesquisa">
@@ -38,6 +39,12 @@
           <th>ID</th>
           <th>Código</th>
           <th>Descrição</th>
+          <th>Referência Uso</th>
+          <th>OS Fabricante</th>
+          <th>Status garantia</th>
+          <th>Status peça garantia</th>
+          <th>Recebimento UPC</th>
+          <th>Modelo Principal</th>
           <th>Categoria</th>
           <th>Ações</th>
         </tr>
@@ -45,7 +52,7 @@
       <tbody></tbody>
     </table>
 
-    <button id="baixar">⬇️ Baixar Inventário (CSV)</button>
+    <button id="baixar">⬇️ Baixar Inventário (Excel)</button>
     <button id="limpar">🗑️ Limpar Inventário</button>
   </section>
 
