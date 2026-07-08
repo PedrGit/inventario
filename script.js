@@ -6,31 +6,32 @@ document.querySelector("#adicionar").addEventListener("click", () => {
 
   const idsInput = document.querySelector("#ids").value;
   const categoria = document.querySelector("input[name='categoria']:checked").value;
-  const ids = idsInput.replace(/,/g, " ").split(" ").map(i => i.trim()).filter(i => i);
+
+  // Agora divide por vírgula, espaço OU quebra de linha
+  const ids = idsInput
+    .split(/[\s,]+/)   // separa por espaço, vírgula ou \n
+    .map(i => i.trim())
+    .filter(i => i);
 
   let encontrados = [];
 
-  // Busca todos os IDs de uma vez
-  const resultados = planilha.filter(row => {
+  planilha.forEach(row => {
     const valor = row[colunaID];
-    if (valor === undefined || valor === null) return false;
+    if (valor === undefined || valor === null) return;
 
     const valorStr = String(valor).trim();
     const valorNum = Number(valor);
 
-    // Retorna verdadeiro se o valor estiver na lista de IDs (como texto ou número)
-    return ids.includes(valorStr) || ids.includes(String(valorNum));
+    if (ids.includes(valorStr) || ids.includes(String(valorNum))) {
+      row.categoria = categoria;
+      if (!inventario.some(item => String(item[colunaID]).trim() === valorStr)) {
+        inventario.push(row);
+        encontrados.push(row);
+      }
+    }
   });
 
-  if (resultados.length > 0) {
-    resultados.forEach(r => {
-      r.categoria = categoria;
-      if (!inventario.some(item => String(item[colunaID]).trim() === String(r[colunaID]).trim())) {
-        inventario.push(r);
-        encontrados.push(r);
-      }
-    });
-
+  if (encontrados.length > 0) {
     atualizarTabela();
     document.querySelector("#ids").value = "";
     alert(`✅ ${encontrados.length} IDs adicionados ao inventário.`);
