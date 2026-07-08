@@ -15,6 +15,68 @@ function handleFile(e) {
     return;
   }
 
+  // Verifica se o tipo é Excel
+  if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+    statusUpload.textContent = "⚠️ Formato inválido. Envie um arquivo .xlsx ou .xls.";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = (evt) => {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      // Verifica se há planilhas
+      if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+        statusUpload.textContent = "⚠️ Nenhuma aba encontrada na planilha.";
+        return;
+      }
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      planilha = XLSX.utils.sheet_to_json(sheet);
+
+      if (!planilha || planilha.length === 0) {
+        statusUpload.textContent = "⚠️ Planilha vazia ou formato inválido.";
+        return;
+      }
+
+      // Normaliza nomes das colunas
+      planilha = planilha.map(row => {
+        const novo = {};
+        for (let chave in row) {
+          novo[chave.trim().toLowerCase()] = row[chave];
+        }
+        return novo;
+      });
+
+      const colunas = Object.keys(planilha[0]);
+      colunaID = colunas.find(c =>
+        c.includes("id") || c.includes("codigo") || c.includes("código") || c.includes("item") || c.includes("sap")
+      );
+
+      if (!colunaID) {
+        statusUpload.textContent = "⚠️ Nenhuma coluna de ID encontrada na planilha.";
+        return;
+      }
+
+      statusUpload.textContent = `✅ Planilha carregada: ${file.name} (${planilha.length} linhas) | Coluna de ID detectada: ${colunaID}`;
+      console.log("Colunas detectadas:", colunas);
+    } catch (error) {
+      statusUpload.textContent = "❌ Erro ao ler a planilha. Verifique se o arquivo está salvo corretamente.";
+      console.error(error);
+    }
+  };
+
+  reader.onerror = () => {
+    statusUpload.textContent = "❌ Erro ao carregar o arquivo. Tente novamente.";
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+
   const reader = new FileReader();
 
   reader.onload = (evt) => {
